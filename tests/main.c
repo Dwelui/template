@@ -2,7 +2,5 @@
 #include <dwelui/template.h>
 
 int main() {
-    test_run();
-
-    return 0;
+    return test();
 }
