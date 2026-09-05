@@ -3,15 +3,27 @@ CC := gcc
 AR := ar
 ARFLAGS := rcs
 
+# Source --------------------------------
 TARGET := build/templatelib.a
-TEST_RUNNER := build/tests/run-tests
 
 CFLAGS := -Wall -Wextra -Wpedantic -std=c23 -Iinclude
-TEST_CFLAGS := $(CFLAGS) -g -fsanitize=address -O0
-TEST_LDFLAGS := -fsanitize=address
 
 SRC := $(wildcard src/*.c)
 OBJ := $(SRC:src/%.c=build/obj/%.o)
+
+
+# Libraries -----------------------------
+REPO_ROOT := ..
+
+TESTLIB := $(REPO_ROOT)/test
+
+
+# Tests ---------------------------------
+TEST_RUNNER := build/tests/run-tests
+
+TEST_CFLAGS := $(CFLAGS) -g -fsanitize=address -O0
+TEST_LDFLAGS := -fsanitize=address
+
 TEST_SRC := $(wildcard tests/*.c)
 TEST_OBJ := $(TEST_SRC:tests/%.c=build/test-obj/%.o)
 
