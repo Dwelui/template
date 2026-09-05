@@ -21,15 +21,16 @@ TESTLIB := $(REPO_ROOT)/test
 # Tests ---------------------------------
 TEST_RUNNER := build/tests/run-tests
 
-TEST_CFLAGS := $(CFLAGS) -g -fsanitize=address -O0
-TEST_LDFLAGS := -fsanitize=address
+TEST_CFLAGS := $(CFLAGS) -I$(TESTLIB)/include -g -fsanitize=address -O0
+TEST_LDFLAGS := -L$(TESTLIB)/build -fsanitize=address
 
 TEST_SRC := $(wildcard tests/*.c)
 TEST_OBJ := $(TEST_SRC:tests/%.c=build/test-obj/%.o)
 
 .PHONY: all test clean compdb
 
-all: $(TARGET)
+# Source --------------------------------
+all: libs $(TARGET)
 
 $(TARGET): $(OBJ)
 	@mkdir -p $(@D)
@@ -39,6 +40,13 @@ build/obj/%.o: src/%.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+
+# Libraries -----------------------------
+libs:
+	$(MAKE) -C $(TESTLIB)
+
+
+# Tests ---------------------------------
 build/test-obj/%.o: tests/%.c
 	@mkdir -p $(@D)
 	@$(CC) $(TEST_CFLAGS) -c $< -o $@
@@ -47,9 +55,11 @@ $(TEST_RUNNER): $(OBJ) $(TEST_OBJ)
 	@mkdir -p $(@D)
 	@$(CC) $^ $(TEST_LDFLAGS) -o $@
 
-test: $(TEST_RUNNER)
+test: libs $(TEST_RUNNER)
 	@$(TEST_RUNNER)
 
+
+# Tools
 clean:
 	rm -rf build
 
