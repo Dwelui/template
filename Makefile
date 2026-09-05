@@ -45,7 +45,7 @@ build/source/obj/%.o: src/%.c
 
 # Libraries -----------------------------
 libs:
-	$(MAKE) -C $(TESTLIB)
+	@$(MAKE) -C $(TESTLIB) --no-print-directory -q
 
 
 # Tests ---------------------------------
