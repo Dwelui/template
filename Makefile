@@ -27,7 +27,7 @@ TEST_LDFLAGS := -fsanitize=address \
 	-L$(TESTLIB)/build/ -ltest
 
 TEST_SRC := $(wildcard tests/*.c)
-TEST_OBJ := $(TEST_SRC:tests/%.c=build/test-obj/%.o)
+TEST_OBJ := $(TEST_SRC:tests/%.c=build/tests/obj/%.o)
 
 .PHONY: all test clean compdb
 
@@ -49,7 +49,7 @@ libs:
 
 
 # Tests ---------------------------------
-build/test-obj/%.o: tests/%.c
+build/tests/obj/%.o: tests/%.c
 	@mkdir -p $(@D)
 	@$(CC) $(TEST_CFLAGS) -c $< -o $@
 
@@ -61,7 +61,7 @@ test: libs $(TEST_RUNNER)
 	@$(TEST_RUNNER)
 
 
-# Tools
+# Tools ---------------------------------
 clean:
 	rm -rf build
 
