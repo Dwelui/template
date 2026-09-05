@@ -4,7 +4,7 @@ AR := ar
 ARFLAGS := rcs
 
 # Source --------------------------------
-TARGET := build/templatelib.a
+TARGET := build/libtemplate.a
 
 CFLAGS := -Wall -Wextra -Wpedantic -std=c23 -Iinclude
 
@@ -21,8 +21,10 @@ TESTLIB := $(REPO_ROOT)/test
 # Tests ---------------------------------
 TEST_RUNNER := build/tests/run-tests
 
-TEST_CFLAGS := $(CFLAGS) -I$(TESTLIB)/include -g -fsanitize=address -O0
-TEST_LDFLAGS := -L$(TESTLIB)/build -fsanitize=address
+TEST_CFLAGS := $(CFLAGS) -g -fsanitize=address -O0 \
+	-I$(TESTLIB)/include
+TEST_LDFLAGS := -fsanitize=address \
+	-L$(TESTLIB)/build/ -ltest
 
 TEST_SRC := $(wildcard tests/*.c)
 TEST_OBJ := $(TEST_SRC:tests/%.c=build/test-obj/%.o)
