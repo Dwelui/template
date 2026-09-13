@@ -16,15 +16,27 @@ OBJ := $(SRC:src/%.c=build/source/obj/%.o)
 REPO_ROOT := ..
 
 TESTLIB := $(REPO_ROOT)/test
+STRINGLIB := $(REPO_ROOT)/string
+
+CFLAGS += \
+	-I$(STRINGLIB)/include
+
+LDFLAGS += \
+	-L$(STRINGLIB)/build
+
+LDLIBS += \
+	-lstring
 
 
 # Tests ---------------------------------
 TEST_RUNNER := build/tests/run-tests
 
-TEST_CFLAGS := $(CFLAGS) -g -fsanitize=address -O0 \
+TEST_CFLAGS := -g -fsanitize=address -O0 $(CFLAGS) \
 	-I$(TESTLIB)/include
-TEST_LDFLAGS := -fsanitize=address \
-	-L$(TESTLIB)/build/ -ltest
+TEST_LDFLAGS := -fsanitize=address $(LDFLAGS) \
+	-L$(TESTLIB)/build/
+TEST_LDLIBS := $(LDLIBS) \
+	-ltest
 
 TEST_SRC := $(wildcard tests/*.c)
 TEST_OBJ := $(TEST_SRC:tests/%.c=build/tests/obj/%.o)
@@ -34,18 +46,19 @@ TEST_OBJ := $(TEST_SRC:tests/%.c=build/tests/obj/%.o)
 # Source --------------------------------
 all: libs $(TARGET)
 
-$(TARGET): $(OBJ)
-	@mkdir -p $(@D)
-	$(AR) $(ARFLAGS) $@ $^
-
 build/source/obj/%.o: src/%.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+$(TARGET): $(OBJ)
+	@mkdir -p $(@D)
+	@$(AR) $(ARFLAGS) $@ $^
+
 
 # Libraries -----------------------------
 libs:
-	@$(MAKE) -C $(TESTLIB) --no-print-directory -q
+	@$(MAKE) -C $(TESTLIB) --silent
+	@$(MAKE) -C $(STRINGLIB) --silent
 
 
 # Tests ---------------------------------
@@ -55,7 +68,7 @@ build/tests/obj/%.o: tests/%.c
 
 $(TEST_RUNNER): $(OBJ) $(TEST_OBJ)
 	@mkdir -p $(@D)
-	@$(CC) $^ $(TEST_LDFLAGS) -o $@
+	@$(CC) $^ $(TEST_LDFLAGS) $(TEST_LDLIBS) -o $@
 
 test: libs $(TEST_RUNNER)
 	@$(TEST_RUNNER)
